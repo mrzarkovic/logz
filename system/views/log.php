@@ -1,7 +1,8 @@
 <section class="main content">
-	<input type="button" onclick="logz.addEntry();" value="Dodaj log" class="add-player">
+	<h1><?php echo $log->name; ?></h1>
+	<input type="button" onclick="logz.addEntry();" value="Dodaj zapis" class="add-player">
 	<div class="clearfix">
-		<table id="table" class="logz-table">
+		<table id="table" class="logz-table" data-id="<?php echo $log->id; ?>">
 			<thead data-role="table-head">
 			<tr data-role="header-row" class="">
 				<th data-role="header-col" class="entry-no-col">

@@ -5,7 +5,6 @@ namespace Tourizm\Model;
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Log extends Repository {
-	protected static $id_field = "id";
 	protected static $fields = array(
 		"name" => "string",
 		"date_added" => "date"

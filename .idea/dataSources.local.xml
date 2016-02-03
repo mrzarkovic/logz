@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="dataSourceStorageLocal">
+    <data-source name="MySQL - logz@localhost" uuid="35203bab-879f-4973-a94e-44a4cd5f32f9">
+      <secret-storage>master_key</secret-storage>
+      <user-name>root</user-name>
+      <schema-pattern>logz.*</schema-pattern>
+      <default-schemas>logz.*</default-schemas>
+    </data-source>
+  </component>
+</project>

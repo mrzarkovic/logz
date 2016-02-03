@@ -47,6 +47,8 @@ function LogZ(idName) {
      * Save the game row
      */
     this.saveRow = function (e) {
+        var logText = "";
+        var logId = this.table.attr("data-id");
         var parentRow = $(e).parents("tr");
 
         var childSelector = "[data-role='log-col']";
@@ -65,12 +67,29 @@ function LogZ(idName) {
             var disabeledInput = _this.getTemplateClone("disabled-input");
             var input = $(child).children();
             if (input.attr("data-role") != "disabled-input") {
-                var val = input.val();
-                if (val == "") val = defaultVal;
+                logText = input.val();
+                if (logText == "") logText = defaultVal;
                 $(input).remove();
-                $(disabeledInput).html(val);
+                $(disabeledInput).html(logText);
                 $(disabeledInput).appendTo($(child));
             }
+        });
+
+        // Ajax save to database
+        var request = $.ajax({
+            url: "/log/ajax/add-entry/" + logId,
+            method: "POST",
+            data: { logText : logText },
+            dataType: "html"
+        });
+
+        request.done(function( msg ) {
+            console.log(msg);
+            //$( "#log" ).html( msg );
+        });
+
+        request.fail(function( jqXHR, textStatus ) {
+            alert( "Request failed: " + textStatus );
         });
     };
 

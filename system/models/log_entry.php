@@ -6,16 +6,13 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Log_entry extends Repository {
 	protected static $fields = array(
-		"id" => "int",
 		"date_added" => "date",
 		"text" => "string",
 		"parent_id" => "int"
 	);
+	protected static $table_name = "log_entries";
 
 	public function __construct($row = array()) {
-		var_dump("A");
-		parent::__construct($row = array());
-
-		$this->total = 0;
+		parent::__construct($row);
 	}
 }

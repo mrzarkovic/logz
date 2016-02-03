@@ -92,7 +92,7 @@ class Core {
 		// Set the variables to use in the template
 		$this->to_tpl = $class->to_tpl;
 		// Set the child template name
-		$this->template = $class->template;
+		$this->template = ($class->template) ? $class->template : "404";
 		// Set the page title
 		$this->title = $this->site_name . " | " . $class->page_name;
 		// Set the message for a user
