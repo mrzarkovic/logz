@@ -20,6 +20,19 @@
 			</thead>
 			<tbody data-role="table-body">
 				<!-- Results per log -->
+				<?php $i = 0; foreach ($log_entries as $log_entry) : $i++; ?>
+					<tr data-role="entry-row" data-status="inactive" data-id="<?php echo $log_entry->id; ?>" class="">
+						<td data-role="entry-no-col" class="entry-no-col"><?php echo $i; ?></td>
+						<td data-role="date-col" class="date-col"><?php echo $log_entry->date_added->format('d.m.Y. H:i:s'); ?></td>
+						<td data-role="log-col" class="log-col">
+							<div data-role="disabled-input" class="disabled-input"><?php echo $log_entry->text; ?></div></td>
+						<td data-role="controls-col" class="controls-col">
+							<input type="button" value="Sačuvaj" onclick="logz.saveRow(this)" class="finish-control button">
+							<input type="button" value="Izmeni" onclick="logz.editRow(this)" class="edit-control button">
+							<input type="button" value="Obriši" onclick="logz.deleteRow(this)" class="delete-control button">
+						</td>
+					</tr>
+				<?php endforeach; ?>
 			</tbody>
 			<tfoot data-role="table-foot">
 				<!-- Sum of results -->
@@ -44,6 +57,7 @@
 	<td data-role="controls-col-template" class="controls-col template">
 		<input type="button" value="Sačuvaj" onclick="logz.saveRow(this)" class="finish-control button">
 		<input type="button" value="Izmeni" onclick="logz.editRow(this)" class="edit-control button">
+		<input type="button" value="Obriši" onclick="logz.deleteRow(this)" class="delete-control button">
 	</td>
 </table>
 <script>

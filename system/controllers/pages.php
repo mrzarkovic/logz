@@ -13,12 +13,18 @@ class Pages extends Core {
 		parent::__construct();
 	}
 
+	/**
+	 * Show the homepage
+	 * @throws \Exception
+	 */
 	public function home() {
 		$logs = new Log();
 		$logs->fetchAll();
 
 		$this->to_tpl['logs'] = $logs;
 		$this->template = "home";
+
+		return;
 	}
 
 }

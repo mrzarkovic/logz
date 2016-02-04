@@ -20,8 +20,8 @@
 			<tbody data-role="table-body">
 				<!-- Results per log -->
 				<?php foreach ($logs->list as $log) : ?>
-					<tr data-role="entry-row" data-status="" data-id="">
-						<td data-role="entry-no-col" class="entry-no-col"><?php echo $log->id; ?></td>
+					<tr data-role="entry-row" data-status="inactive" data-id="<?php echo $log->id; ?>">
+						<td data-role="entry-no-col" class="entry-no-col">#</td>
 						<td data-role="date-col" class="date-col"><?php echo $log->date_added->format('d.m.Y. H:i:s'); ?></td>
 						<td data-role="log-col" class="log-col"><div data-role="disabled-input" class="disabled-input"><a href="/log/<?php echo $log->id; ?>"><?php echo $log->name; ?></a></div></td>
 						<td data-role="controls-col" class="controls-col">

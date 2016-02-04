@@ -24,6 +24,8 @@ class Logs extends Core {
 		$this->to_tpl['log'] = $log;
 		$this->to_tpl['log_entries'] = $log_entries->list;
 		$this->template = "log";
+
+		return;
 	}
 
 }

@@ -132,22 +132,58 @@ class Repository {
 		}
 	}
 
+	/**
+	 * Save the object to a database table
+	 * @return bool|string
+	 * @throws \Exception
+	 */
 	public function save() {
 		$fields = "(";
 		$values = "(";
-		foreach (static::$fields as $field) {
+		foreach (static::$fields as $field => $type) {
 			$fields .= "`" . $field . "`,";
-			$values .= $this->$field . ",";
+			if ($type == "date")
+				$values .= "'" . $this->$field->format("Y-m-d H:i:s") . "',";
+			else
+				$values .= "'" . $this->$field . "',";
 		}
-		rtrim($fields, ",");
-		rtrim($values, ",");
+		// Remove the trailing commas
+		$fields = rtrim($fields, ",");
+		$values = rtrim($values, ",");
 		$fields .= ")";
 		$values .= ")";
 
 		try {
 			$stmt = self::$db->prepare("INSERT INTO " . static::$table_name . " " . $fields . " VALUES " . $values);
 			if ($stmt->execute())
-				return new static($stmt->fetch(PDO::FETCH_ASSOC));
+				return self::$db->lastInsertId();
+			else
+				return false;
+		} catch (\PDOException $e) {
+			throw new \Exception("Error: " . $e->getMessage());
+		}
+	}
+
+	/**
+	 * Update a row in the database table
+	 * @return bool
+	 * @throws \Exception
+	 */
+	public function update() {
+		$set = "";
+		foreach (static::$fields as $field => $type) {
+			if ($type == "date")
+				$set .= "`" . $field . "`='" . $this->$field->format("Y-m-d H:i:s") . "',";
+			else
+				$set .= "`" . $field . "`='" . $this->$field . "',";
+		}
+		$set = rtrim($set, ",");
+		try {
+			$stmt = self::$db->prepare("UPDATE " . static::$table_name . " SET " . $set . " WHERE `" . self::$id_field . "`=:id");
+			$id_field = static::$id_field;
+			$stmt->bindParam(':id', $this->$id_field, PDO::PARAM_INT);
+			if ($stmt->execute())
+				return $this->$id_field;
 			else
 				return false;
 		} catch (\PDOException $e) {

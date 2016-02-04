@@ -7,17 +7,14 @@ function LogZ(idName) {
     this.playersHolder = $("[data-role='table-head']");
     this.logsHolder = $("[data-role='table-body']");
     this.resultsHolder = $("[data-role='table-foot']");
-    this.totalLogs = 0;
-    this.currentLog = 0;
 
     /**
-     * Add a new player
+     * Add a new entry
      */
     this.addEntry = function () {
         // Add log column
-        this.totalLogs++;
-        this.currentLog = this.totalLogs;
-        console.log("total logs: " +this.totalLogs);
+        var currentLog = $("[data-role='entry-no-col']").last();
+        currentLog = parseInt(currentLog.html()) + 1;
 
         var entryRow = this.getTemplateClone("entry-row");
         var logControls = this.getTemplateClone("controls-col", true);
@@ -26,7 +23,7 @@ function LogZ(idName) {
         var logCol = this.getTemplateClone("log-col");
         var logInput = this.getTemplateClone("input");
 
-        entryNoCol.html(this.currentLog);
+        entryNoCol.html(currentLog);
         entryNoCol.appendTo(entryRow);
 
         dateCol.html(this.getFormattedDate());
@@ -38,13 +35,12 @@ function LogZ(idName) {
         logControls.appendTo(entryRow);
 
         entryRow.addClass("active");
-        entryRow.attr("data-status", "editing");
-        entryRow.attr("data-id", this.currentLog);
+        //entryRow.attr("data-status", "editing");
         entryRow.appendTo(this.logsHolder);
     };
 
     /**
-     * Save the game row
+     * Save the entry
      */
     this.saveRow = function (e) {
         var logText = "";
@@ -53,39 +49,44 @@ function LogZ(idName) {
 
         var childSelector = "[data-role='log-col']";
         var defaultVal = "/";
+        var ajaxUrl = "";
+        var entryId = 0;
+        var date = parentRow.children("[data-role='date-col']").html();
 
         // Check for editing
         if (parentRow.attr("data-status") == "editing") {
-            parentRow.attr("data-status", "inactive");
-            parentRow.toggleClass("active");
+            entryId = parentRow.attr("data-id");
+            ajaxUrl = "/log/ajax/edit-entry/" + entryId;
+        } else {
+            ajaxUrl = "/log/ajax/add-entry/" + logId;
         }
 
-        // Disable input field
-        var children = parentRow.children(childSelector);
-        var _this = this;
-        $.each(children, function (i, child) {
-            var disabeledInput = _this.getTemplateClone("disabled-input");
-            var input = $(child).children();
-            if (input.attr("data-role") != "disabled-input") {
-                logText = input.val();
-                if (logText == "") logText = defaultVal;
-                $(input).remove();
-                $(disabeledInput).html(logText);
-                $(disabeledInput).appendTo($(child));
-            }
-        });
+        var child = parentRow.children(childSelector);
+        var input = $(child).children();
+        var disabeledInput = this.getTemplateClone("disabled-input");
+        if (input.attr("data-role") != "disabled-input") {
+            logText = input.val();
+            if (logText == "") logText = defaultVal;
+        }
 
         // Ajax save to database
         var request = $.ajax({
-            url: "/log/ajax/add-entry/" + logId,
+            url: ajaxUrl,
             method: "POST",
-            data: { logText : logText },
+            data: { logText : logText, date: date},
             dataType: "html"
         });
 
         request.done(function( msg ) {
-            console.log(msg);
-            //$( "#log" ).html( msg );
+            if ( msg != "false" && msg != "" ) {
+                // Disable input field
+                $(input).remove();
+                $(disabeledInput).html(logText);
+                $(disabeledInput).appendTo($(child));
+                parentRow.attr("data-id", msg);
+                parentRow.toggleClass("active");
+                parentRow.attr("data-status", "inactive");
+            }
         });
 
         request.fail(function( jqXHR, textStatus ) {
@@ -94,7 +95,7 @@ function LogZ(idName) {
     };
 
     /**
-     * Edit a game row
+     * Edit an entry
      */
     this.editRow = function (e) {
         var parentRow = $(e).parents("tr");
@@ -112,6 +113,10 @@ function LogZ(idName) {
             $(child).html($(inputField).val(val));
         });
     };
+
+    this.deleteRow = function () {
+        // do something
+    },
 
     /**
      * Get the element clone
