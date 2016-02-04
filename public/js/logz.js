@@ -14,7 +14,11 @@ function LogZ(idName) {
     this.addEntry = function () {
         // Add log column
         var currentLog = $("[data-role='entry-no-col']").last();
-        currentLog = parseInt(currentLog.html()) + 1;
+        if (currentLog.html()) {
+            currentLog = parseInt(currentLog.html()) + 1;
+        } else {
+            currentLog = 1;
+        }
 
         var entryRow = this.getTemplateClone("entry-row");
         var logControls = this.getTemplateClone("controls-col", true);
@@ -35,7 +39,7 @@ function LogZ(idName) {
         logControls.appendTo(entryRow);
 
         entryRow.addClass("active");
-        //entryRow.attr("data-status", "editing");
+        entryRow.attr("data-status", "new");
         entryRow.appendTo(this.logsHolder);
     };
 
@@ -46,19 +50,27 @@ function LogZ(idName) {
         var logText = "";
         var logId = this.table.attr("data-id");
         var parentRow = $(e).parents("tr");
+        var entryId = parentRow.attr("data-id");
+        var dataType = $(this.logsHolder).attr("data-type");
 
         var childSelector = "[data-role='log-col']";
         var defaultVal = "/";
         var ajaxUrl = "";
-        var entryId = 0;
         var date = parentRow.children("[data-role='date-col']").html();
 
         // Check for editing
         if (parentRow.attr("data-status") == "editing") {
-            entryId = parentRow.attr("data-id");
-            ajaxUrl = "/log/ajax/edit-entry/" + entryId;
+            if (dataType == "logs") {
+                ajaxUrl = "/log/ajax/edit-log/" + entryId;
+            } else if (dataType == "log-entries") {
+                ajaxUrl = "/log/ajax/edit-entry/" + entryId;
+            }
         } else {
-            ajaxUrl = "/log/ajax/add-entry/" + logId;
+            if (dataType == "logs") {
+                ajaxUrl = "/log/ajax/add-log";
+            } else if (dataType == "log-entries") {
+                ajaxUrl = "/log/ajax/add-entry/" + logId;
+            }
         }
 
         var child = parentRow.children(childSelector);
@@ -81,7 +93,12 @@ function LogZ(idName) {
             if ( msg != "false" && msg != "" ) {
                 // Disable input field
                 $(input).remove();
-                $(disabeledInput).html(logText);
+                if (dataType == "logs") {
+                    console.log(msg);
+                    $(disabeledInput).html("<a href='/log/" + msg + "'>" + logText + "</a>");
+                } else if (dataType == "log-entries") {
+                    $(disabeledInput).html(logText);
+                }
                 $(disabeledInput).appendTo($(child));
                 parentRow.attr("data-id", msg);
                 parentRow.toggleClass("active");
@@ -109,7 +126,7 @@ function LogZ(idName) {
         var _this = this;
         $.each(children, function (i, child) {
             var inputField = _this.getTemplateClone("input");
-            var val = $(child).children("[data-role='disabled-input']").html();
+            var val = $(child).find("[data-role='disabled-input']").text();
             $(child).html($(inputField).val(val));
         });
     };

@@ -18,7 +18,7 @@
 					Controls
 				</th>
 			</thead>
-			<tbody data-role="table-body">
+			<tbody data-role="table-body" data-type="log-entries">
 				<!-- Results per log -->
 				<?php $i = 0; foreach ($log_entries as $log_entry) : $i++; ?>
 					<tr data-role="entry-row" data-status="inactive" data-id="<?php echo $log_entry->id; ?>" class="">
