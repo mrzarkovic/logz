@@ -48,9 +48,9 @@ function LogZ(idName) {
      */
     this.saveRow = function (e) {
         var logText = "";
-        var logId = this.table.attr("data-id");
+        var logId = parseInt(this.table.attr("data-id"));
         var parentRow = $(e).parents("tr");
-        var entryId = parentRow.attr("data-id");
+        var entryId = parseInt(parentRow.attr("data-id"));
         var dataType = $(this.logsHolder).attr("data-type");
 
         var childSelector = "[data-role='log-col']";
@@ -94,7 +94,6 @@ function LogZ(idName) {
                 // Disable input field
                 $(input).remove();
                 if (dataType == "logs") {
-                    console.log(msg);
                     $(disabeledInput).html("<a href='/log/" + msg + "'>" + logText + "</a>");
                 } else if (dataType == "log-entries") {
                     $(disabeledInput).html(logText);
@@ -131,8 +130,40 @@ function LogZ(idName) {
         });
     };
 
-    this.deleteRow = function () {
-        // do something
+    /**
+     * Deletes an entry
+     */
+    this.deleteRow = function (e) {
+        var parentRow = $(e).parents("tr");
+        var status = parentRow.attr("data-status");
+        if (status == "new") {
+            // Delete the row
+            parentRow.remove();
+        } else {
+            var dataType = $(this.logsHolder).attr("data-type");
+            var entryId = parseInt($(parentRow).attr("data-id"));
+            if (dataType == "logs") {
+                var ajaxUrl = "/log/ajax/delete-log/" + entryId;
+            } else if (dataType == "log-entries") {
+                var ajaxUrl = "/log/ajax/delete-entry/" + entryId;
+            }
+            // Ajax delete from database
+            var request = $.ajax({
+                url: ajaxUrl,
+                method: "POST"
+            });
+
+            request.done(function( msg ) {
+                if ( msg == "true" ) {
+                    // Delete the row
+                    parentRow.remove();
+                }
+            });
+
+            request.fail(function( jqXHR, textStatus ) {
+                alert( "Request failed: " + textStatus );
+            });
+        }
     },
 
     /**

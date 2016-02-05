@@ -31,15 +31,15 @@ class Logs_ajax extends Core
         $log = new Log();
         $log->name = $logName;
         $log->date_added = new \DateTime($date);
-        if ($id = $log->save())
+        if ($id = $log->saveToDb())
             $this->print_ajax($id);
         else
-            $this->print_ajax("fasle");
+            $this->print_ajax("false");
     }
 
     /**
      * Edit the log
-     * @param int $parent_id
+     * @param int $logId
      * @throws \Exception
      */
     public function edit_log($logId = 0)
@@ -50,10 +50,27 @@ class Logs_ajax extends Core
         $log = new Log();
         $log = $log->fetchById($logId);
         $log->name = $logName;
-        if ($id = $log->update())
+        if ($id = $log->updateInDb())
             $this->print_ajax($id);
         else
-            $this->print_ajax("fasle");
+            $this->print_ajax("false");
+    }
+
+    /**
+     * Delete the log
+     * @param int $logId
+     * @throws \Exception
+     */
+    public function delete_log($logId = 0)
+    {
+        settype($logId, "integer");
+
+        $log = new Log();
+        $log = $log->fetchById($logId);
+        if ($log->deleteFromDb())
+            $this->print_ajax("true");
+        else
+            $this->print_ajax("false");
     }
 
 
@@ -73,15 +90,15 @@ class Logs_ajax extends Core
         $log_entry->text = $logText;
         $log_entry->parent_id = (int)$parent_id;
         $log_entry->date_added = new \DateTime($date);
-        if ($id = $log_entry->save())
+        if ($id = $log_entry->saveToDb())
             $this->print_ajax($id);
         else
-            $this->print_ajax("fasle");
+            $this->print_ajax("false");
     }
 
     /**
      * Edit the entry
-     * @param int $parent_id
+     * @param int $entryId
      * @throws \Exception
      */
     public function edit_entry($entryId = 0)
@@ -92,10 +109,27 @@ class Logs_ajax extends Core
         $log_entry = new Log_entry();
         $log_entry = $log_entry->fetchById($entryId);
         $log_entry->text = $logText;
-        if ($id = $log_entry->update())
+        if ($id = $log_entry->updateInDb())
             $this->print_ajax($id);
         else
-            $this->print_ajax("fasle");
+            $this->print_ajax("false");
+    }
+
+    /**
+     * Delete the entry
+     * @param int $entryId
+     * @throws \Exception
+     */
+    public function delete_entry($entryId = 0)
+    {
+        settype($entryId, "integer");
+
+        $log_entry = new Log_entry();
+        $log_entry = $log_entry->fetchById($entryId);
+        if ($log_entry->deleteFromDb())
+            $this->print_ajax("true");
+        else
+            $this->print_ajax("false");
     }
 
     /**

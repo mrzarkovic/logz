@@ -18,7 +18,7 @@ class Repository {
 	public $list = array();
 
 	function __construct($row = array()) {
-		self::$db = self::connect_to_db();
+		self::$db = self::connectToDb();
 		$id_field = static::$id_field;
 		$this->$id_field = (int) (isset($row[static::$id_field]) ? $row[static::$id_field] : 0);
 
@@ -34,7 +34,7 @@ class Repository {
 	 * Connect to a database
 	 * @return PDO connection
 	 */
-	private static function connect_to_db() {
+	private static function connectToDb() {
 		// Database connection
 		$db_user = "root";
 		$db_pass = "";
@@ -101,7 +101,7 @@ class Repository {
 	 * based on the provided id
 	 * @param int $id
 	 * @throws \Exception
-	 * @return bool
+	 * @return bool|Object
 	 */
 	public function fetchById($id = 0) {
 		try {
@@ -137,7 +137,7 @@ class Repository {
 	 * @return bool|string
 	 * @throws \Exception
 	 */
-	public function save() {
+	public function saveToDb() {
 		$fields = "(";
 		$values = "(";
 		foreach (static::$fields as $field => $type) {
@@ -166,10 +166,10 @@ class Repository {
 
 	/**
 	 * Update a row in the database table
-	 * @return bool
+	 * @return bool|string
 	 * @throws \Exception
 	 */
-	public function update() {
+	public function updateInDb() {
 		$set = "";
 		foreach (static::$fields as $field => $type) {
 			if ($type == "date")
@@ -184,6 +184,25 @@ class Repository {
 			$stmt->bindParam(':id', $this->$id_field, PDO::PARAM_INT);
 			if ($stmt->execute())
 				return $this->$id_field;
+			else
+				return false;
+		} catch (\PDOException $e) {
+			throw new \Exception("Error: " . $e->getMessage());
+		}
+	}
+
+	/**
+	 * Delete a row in the database table
+	 * @return bool
+	 * @throws \Exception
+	 */
+	public function deleteFromDb() {
+		try {
+			$stmt = self::$db->prepare("DELETE FROM " . static::$table_name . " WHERE `" . self::$id_field . "`=:id");
+			$id_field = static::$id_field;
+			$stmt->bindParam(':id', $this->$id_field, PDO::PARAM_INT);
+			if ($stmt->execute())
+				return true;
 			else
 				return false;
 		} catch (\PDOException $e) {
